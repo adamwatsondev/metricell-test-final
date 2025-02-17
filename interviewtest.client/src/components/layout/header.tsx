@@ -7,6 +7,9 @@ export default function Header() {
         width={100}
         height={100}
       />
+      <span className="text-white text-2xl font-bold ml-4">
+        Metricell Coding Challenge
+      </span>
     </div>
   );
 }

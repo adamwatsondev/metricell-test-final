@@ -51,5 +51,55 @@ public class EmployeesController : ControllerBase
             return affectedRows > 0 ? Ok() : NotFound();
         }
     }
+
+[HttpPost]
+public IActionResult AddEmployee([FromBody] Employee newEmployee)
+{
+    if (string.IsNullOrEmpty(newEmployee.Name) || newEmployee.Value <= 0)
+    {
+        return BadRequest("Name and Value are required fields.");
+    }
+
+    using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
+    {
+        connection.Open();
+
+        var insertCmd = connection.CreateCommand();
+        insertCmd.CommandText = @"INSERT INTO Employees (Name, Value) 
+                                  VALUES (@name, @value)";
+        insertCmd.Parameters.AddWithValue("@name", newEmployee.Name);
+        insertCmd.Parameters.AddWithValue("@value", newEmployee.Value);
+
+        int affectedRows = insertCmd.ExecuteNonQuery();
+
+        if (affectedRows > 0)
+        {
+            return Ok();
+        }
+        else
+        {
+            return StatusCode(500, "Failed to add employee.");
+        }
+    }
+}
+
+[HttpPut("{id}")]
+public IActionResult Update(int id, [FromBody] Employee updatedEmployee)
+{
+    using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
+    {
+        connection.Open();
+        var updateCmd = connection.CreateCommand();
+        updateCmd.CommandText = "UPDATE Employees SET Name = @name, Value = @value WHERE ID = @id";
+        updateCmd.Parameters.AddWithValue("@id", id);
+        updateCmd.Parameters.AddWithValue("@name", updatedEmployee.Name);
+        updateCmd.Parameters.AddWithValue("@value", updatedEmployee.Value);
+
+        int affectedRows = updateCmd.ExecuteNonQuery();
+        
+        return affectedRows > 0 ? Ok() : NotFound();
+    }
+}
+
 }
 }
