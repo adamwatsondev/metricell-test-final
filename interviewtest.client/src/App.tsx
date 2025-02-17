@@ -10,7 +10,7 @@ interface Employee {
 
 function App() {
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [newEmployee, setNewEmployee] = useState({ name: "", value: 0 });
+  //   const [newEmployee, setNewEmployee] = useState({ name: "", value: 0 });
 
   useEffect(() => {
     fetchEmployees();
