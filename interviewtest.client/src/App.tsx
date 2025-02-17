@@ -3,7 +3,6 @@ import Header from "./components/layout/header";
 import Footer from "./components/layout/footer";
 import { Button, Table, Theme } from "@radix-ui/themes";
 import { Toaster, toast } from "sonner";
-import { XIcon } from "lucide-react";
 
 interface Employee {
   id: number;
@@ -68,14 +67,30 @@ function App() {
               <Table.Cell>{employee.id}</Table.Cell>
               <Table.Cell>{employee.name}</Table.Cell>
               <Table.Cell>{employee.value}</Table.Cell>
-              <Table.Cell className="flex justify-end items-center">
+              <Table.Cell className="flex justify-end gap-2 items-center">
+                <Button
+                  color="gray"
+                  variant="outline"
+                  highContrast
+                  onClick={() => removeEmployee(employee.id)}
+                >
+                  <img
+                    src="/icons/edit.svg"
+                    className="text-white size-4"
+                    alt="edit"
+                  />
+                </Button>
                 <Button
                   color="red"
                   variant="classic"
                   highContrast
                   onClick={() => removeEmployee(employee.id)}
                 >
-                  <XIcon />
+                  <img
+                    src="/icons/delete.svg"
+                    className="text-white size-6"
+                    alt="delete"
+                  />
                 </Button>
               </Table.Cell>
             </Table.Row>
@@ -96,7 +111,10 @@ function App() {
             <span className="text-2xl font-bold">
               Employees: {employees.length}
             </span>
-            <span className="text-2xl font-bold">Add</span>
+            <div className="text-2xl h-12 bg-green-500 rounded-md items-center p-4 flex gap-2 font-bold">
+              <img src="/icons/plus.svg" className="size-6" alt="add" />
+              <span className="text-white">Add</span>
+            </div>
           </div>
           <div className="flex flex-col gap-4">
             <EmployeeTable
