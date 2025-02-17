@@ -9,6 +9,7 @@ import {
   Text,
   TextField,
   Theme,
+  Tooltip,
 } from "@radix-ui/themes";
 import { Toaster, toast } from "sonner";
 
@@ -247,6 +248,40 @@ function App() {
     );
   };
 
+  const updateValues = async () => {
+    try {
+      const response = await fetch("/api/list/update-values", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast.success("Values updated successfully.");
+        fetchEmployees();
+      } else {
+        toast.error("Failed to update values.");
+      }
+    } catch (error) {
+      console.error("Error updating values:", error);
+      toast.error("Failed to update values.");
+    }
+  };
+
+  const fetchSummedValues = async () => {
+    try {
+      const response = await fetch("/api/list/sum-values");
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(`Total Sum: ${data.totalSum}`);
+      } else {
+        toast.info("No sum data available.");
+      }
+    } catch (error) {
+      console.error("Error fetching sum values:", error);
+      toast.error("Failed to fetch sum values.");
+    }
+  };
+
   return (
     <>
       <Theme>
@@ -254,6 +289,17 @@ function App() {
           <Header />
         </div>
         <div className="flex pt-40 flex-col px-40 gap-4">
+          <div className="flex justify-end gap-4">
+            <Tooltip content="Increment the field `Value` by 1 where the field `Name` starts with ‘E’, by 10 where `Name` starts with ‘G’ and all others by 100.">
+              <Button onClick={updateValues} color="blue">
+                Update Employee Values
+              </Button>
+            </Tooltip>
+            <Button onClick={fetchSummedValues} color="purple">
+              Fetch Summed Values
+            </Button>
+          </div>
+
           <div className="flex justify-between">
             <span className="text-2xl font-bold">
               Employees: {employees.length}
