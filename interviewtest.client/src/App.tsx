@@ -134,11 +134,17 @@ function App() {
                   onOpenChange={(open) => open || setEditingEmployee(null)}
                 >
                   <Dialog.Trigger>
-                    <Button color="blue">Edit</Button>
+                    <Button color="gray">
+                      <img
+                        src="/icons/edit.svg"
+                        className="text-white size-6"
+                        alt="edit"
+                      />
+                    </Button>
                   </Dialog.Trigger>
 
                   <Dialog.Content maxWidth="450px">
-                    <Dialog.Title>Edit Entry</Dialog.Title>
+                    <Dialog.Title>Edit Employee</Dialog.Title>
 
                     <Flex direction="column" gap="3">
                       <label>
@@ -210,7 +216,7 @@ function App() {
                     <Flex direction="column" gap="3">
                       <label>
                         <Text as="div" size="2" mb="1" weight="regular">
-                          Are you sure you want to delete this entry?
+                          Are you sure you want to delete this Employee?
                         </Text>
                       </label>
                     </Flex>
@@ -264,9 +270,9 @@ function App() {
               </Dialog.Trigger>
 
               <Dialog.Content maxWidth="450px">
-                <Dialog.Title>Add Entry</Dialog.Title>
+                <Dialog.Title>Add Employee</Dialog.Title>
                 <Dialog.Description size="2" mb="4">
-                  Add an entry to the database.
+                  Add an Employee to the database.
                 </Dialog.Description>
 
                 <Flex direction="column" gap="3">
