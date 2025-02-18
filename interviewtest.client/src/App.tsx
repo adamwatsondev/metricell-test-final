@@ -14,6 +14,7 @@ import {
 } from "@radix-ui/themes";
 import { Toaster, toast } from "sonner";
 
+// Type safety
 interface Employee {
   id: number;
   name: string;
@@ -27,6 +28,7 @@ interface GroupedSummedEmployee {
 }
 
 function App() {
+  // State handling
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [newEmployee, setNewEmployee] = useState({ name: "", value: 0 });
   const [summedEmployees, setSummedEmployees] = useState<Employee[]>([]);
@@ -34,15 +36,18 @@ function App() {
   const [groupedSummedEmployees, setGroupedSummedEmployees] = useState<
     GroupedSummedEmployee[]
   >([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchEmployees();
   }, []);
 
   const fetchEmployees = async () => {
+    setLoading(true);
     const response = await fetch("api/employees");
     const data = await response.json();
     setEmployees(data);
+    setLoading(false);
   };
 
   const addEmployee = async () => {
@@ -122,9 +127,11 @@ function App() {
   }: {
     employees: Employee[];
     removeEmployee: (id: number) => void;
+    // React integrated function to update state
     setEditingEmployee: React.Dispatch<React.SetStateAction<Employee | null>>;
   }) => {
     return (
+      // Radix UI Table Integration
       <Table.Root variant="surface">
         <Table.Header>
           <Table.ColumnHeaderCell>ID</Table.ColumnHeaderCell>
@@ -292,6 +299,8 @@ function App() {
     }
   };
 
+  // This was my first attempt at the second task, this is incorrect but left in
+  // to show thought process
   const fetchSummedValues = async () => {
     try {
       const response = await fetch("/api/list/sum-values");
@@ -314,7 +323,7 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         setGroupedSummedEmployees(data);
-        toast.success("Grouped Summed Values fetched.");
+        toast.success("Grouped values fetched.");
       } else {
         toast.info("No data available for grouped sums.");
       }
@@ -331,7 +340,7 @@ function App() {
           <Header />
         </div>
         <div className="flex pt-32 sm:pt-40 flex-col px-4 sm:px-40 gap-4">
-          <Tabs.Root defaultValue="account">
+          <Tabs.Root defaultValue="employees">
             <Tabs.List>
               <Tabs.Trigger value="employees">Employees</Tabs.Trigger>
               <Tabs.Trigger value="summed">Summed</Tabs.Trigger>
@@ -340,106 +349,116 @@ function App() {
 
             <Box pt="3">
               <Tabs.Content className="flex flex-col gap-4" value="employees">
-                <div className="flex items-center justify-between">
-                  <span className="sm:text-2xl text-sm font-bold">
-                    Employees: {employees.length}
-                  </span>
-                  <div className="flex gap-2">
-                    <Tooltip content="Increment the field `Value` by 1 where the field `Name` starts with ‘E’, by 10 where `Name` starts with ‘G’ and all others by 100.">
-                      <Button
-                        onClick={updateValues}
-                        variant="outline"
-                        color="blue"
-                      >
-                        Update
-                      </Button>
-                    </Tooltip>
-                    <Dialog.Root>
-                      <Tooltip content="Add an employee">
-                        <Dialog.Trigger>
-                          <Button color="green">
-                            <img
-                              src="/icons/plus.svg"
-                              className="text-white size-6"
-                              alt="add"
-                            />
-                          </Button>
-                        </Dialog.Trigger>
-                      </Tooltip>
-
-                      <Dialog.Content maxWidth="450px">
-                        <Dialog.Title>Add Employee</Dialog.Title>
-                        <Dialog.Description size="2" mb="4">
-                          Add an Employee to the database.
-                        </Dialog.Description>
-
-                        <Flex direction="column" gap="3">
-                          <label>
-                            <Text as="div" size="2" mb="1" weight="bold">
-                              Name
-                            </Text>
-                            <TextField.Root
-                              placeholder="Enter a first name"
-                              value={newEmployee.name}
-                              onChange={(e) =>
-                                setNewEmployee({
-                                  ...newEmployee,
-                                  name: e.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <label>
-                            <Text as="div" size="2" mb="1" weight="bold">
-                              Value
-                            </Text>
-                            <TextField.Root
-                              placeholder="Enter a value"
-                              type="number"
-                              value={newEmployee.value || ""}
-                              onChange={(e) => {
-                                const newValue = e.target.value;
-                                setNewEmployee({
-                                  ...newEmployee,
-                                  value:
-                                    newValue === ""
-                                      ? 0
-                                      : parseInt(newValue) || 0,
-                                });
-                              }}
-                            />
-                          </label>
-                        </Flex>
-
-                        <Flex gap="3" mt="4" justify="end">
-                          <Dialog.Close>
-                            <Button variant="soft" color="gray">
-                              Cancel
-                            </Button>
-                          </Dialog.Close>
-                          <Dialog.Close>
-                            <Button
-                              onClick={addEmployee}
-                              variant="solid"
-                              color="green"
-                            >
-                              Add
-                            </Button>
-                          </Dialog.Close>
-                        </Flex>
-                      </Dialog.Content>
-                    </Dialog.Root>
+                {loading ? (
+                  <div className="loading-spinner">
+                    <div className="spinner"></div>
                   </div>
-                </div>
-                <div className="flex flex-col gap-4">
-                  <EmployeeTable
-                    employees={employees}
-                    removeEmployee={removeEmployee}
-                    setEditingEmployee={setEditingEmployee}
-                  />
-                </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="sm:text-2xl text-sm font-bold">
+                        Employees: {employees.length}
+                      </span>
+                      <div className="flex gap-2">
+                        <Tooltip content="Increment the field `Value` by 1 where the field `Name` starts with ‘E’, by 10 where `Name` starts with ‘G’ and all others by 100.">
+                          <Button
+                            onClick={updateValues}
+                            variant="outline"
+                            color="blue"
+                          >
+                            Update
+                          </Button>
+                        </Tooltip>
+                        <Dialog.Root>
+                          <Tooltip content="Add an employee">
+                            <Dialog.Trigger>
+                              <Button color="green">
+                                <img
+                                  src="/icons/plus.svg"
+                                  className="text-white size-6"
+                                  alt="add"
+                                />
+                              </Button>
+                            </Dialog.Trigger>
+                          </Tooltip>
+
+                          <Dialog.Content maxWidth="450px">
+                            <Dialog.Title>Add Employee</Dialog.Title>
+                            <Dialog.Description size="2" mb="4">
+                              Add an Employee to the database.
+                            </Dialog.Description>
+
+                            <Flex direction="column" gap="3">
+                              <label>
+                                <Text as="div" size="2" mb="1" weight="bold">
+                                  Name
+                                </Text>
+                                <TextField.Root
+                                  placeholder="Enter a first name"
+                                  value={newEmployee.name}
+                                  onChange={(e) =>
+                                    setNewEmployee({
+                                      ...newEmployee,
+                                      name: e.target.value,
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                <Text as="div" size="2" mb="1" weight="bold">
+                                  Value
+                                </Text>
+                                <TextField.Root
+                                  placeholder="Enter a value"
+                                  type="number"
+                                  value={newEmployee.value || ""}
+                                  onChange={(e) => {
+                                    const newValue = e.target.value;
+                                    setNewEmployee({
+                                      ...newEmployee,
+                                      value:
+                                        newValue === ""
+                                          ? 0
+                                          : parseInt(newValue) || 0,
+                                    });
+                                  }}
+                                />
+                              </label>
+                            </Flex>
+
+                            <Flex gap="3" mt="4" justify="end">
+                              <Dialog.Close>
+                                <Button variant="soft" color="gray">
+                                  Cancel
+                                </Button>
+                              </Dialog.Close>
+                              <Dialog.Close>
+                                <Button
+                                  onClick={addEmployee}
+                                  variant="solid"
+                                  color="green"
+                                >
+                                  Add
+                                </Button>
+                              </Dialog.Close>
+                            </Flex>
+                          </Dialog.Content>
+                        </Dialog.Root>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <EmployeeTable
+                        employees={employees}
+                        removeEmployee={removeEmployee}
+                        setEditingEmployee={setEditingEmployee}
+                      />
+                    </div>
+                  </>
+                )}
               </Tabs.Content>
 
+              {/* This was my first attempt at the second task, this is incorrect
+              but left in to show thought process */}
               <Tabs.Content className="flex flex-col gap-4" value="summed">
                 <div className="flex justify-center gap-4">
                   <Button onClick={fetchSummedValues} color="blue">
@@ -479,6 +498,7 @@ function App() {
                   </div>
                 )}
               </Tabs.Content>
+              {/* */}
 
               <Tabs.Content className="flex flex-col gap-4" value="grouped">
                 <div className="flex justify-center gap-4">
@@ -502,11 +522,11 @@ function App() {
                         <Table.Body>
                           <Table.Row>
                             <Table.Cell>
-                              <ul>
+                              <div>
                                 {group.employees.map((employee, index) => (
-                                  <li key={index}>{employee}</li>
+                                  <div key={index}>{employee}</div>
                                 ))}
-                              </ul>
+                              </div>
                             </Table.Cell>
                             <Table.Cell>{group.value}</Table.Cell>
                           </Table.Row>

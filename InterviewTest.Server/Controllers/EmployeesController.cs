@@ -37,69 +37,79 @@ public class EmployeesController : ControllerBase
         return employees;
     }
 
+    // Deletes an employee from the database by ID.
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
         using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
         {
             connection.Open();
+
+            // Prepare the SQL command to delete an employee by ID
             var deleteCmd = connection.CreateCommand();
             deleteCmd.CommandText = "DELETE FROM Employees WHERE ID = @id";
             deleteCmd.Parameters.AddWithValue("@id", id);
+
+            // Execute the deletion and check how many rows were affected
             int affectedRows = deleteCmd.ExecuteNonQuery();
 
             return affectedRows > 0 ? Ok() : NotFound();
         }
     }
 
-[HttpPost]
-public IActionResult AddEmployee([FromBody] Employee newEmployee)
-{
-    if (string.IsNullOrEmpty(newEmployee.Name) || newEmployee.Value <= 0)
+    // Add a new employee to the database.
+    [HttpPost]
+    public IActionResult AddEmployee([FromBody] Employee newEmployee)
     {
-        return BadRequest("Name and Value are required fields.");
-    }
-
-    using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
-    {
-        connection.Open();
-
-        var insertCmd = connection.CreateCommand();
-        insertCmd.CommandText = @"INSERT INTO Employees (Name, Value) 
-                                  VALUES (@name, @value)";
-        insertCmd.Parameters.AddWithValue("@name", newEmployee.Name);
-        insertCmd.Parameters.AddWithValue("@value", newEmployee.Value);
-
-        int affectedRows = insertCmd.ExecuteNonQuery();
-
-        if (affectedRows > 0)
+        // Validate that Name and Value are provided and valid
+        if (string.IsNullOrEmpty(newEmployee.Name) || newEmployee.Value <= 0)
         {
-            return Ok();
+            return BadRequest("Name and Value are required fields.");
         }
-        else
+
+        using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
         {
-            return StatusCode(500, "Failed to add employee.");
+            connection.Open();
+
+            // Prepare the SQL command to insert a new employee
+            var insertCmd = connection.CreateCommand();
+            insertCmd.CommandText = @"INSERT INTO Employees (Name, Value) 
+                                    VALUES (@name, @value)";
+            insertCmd.Parameters.AddWithValue("@name", newEmployee.Name);
+            insertCmd.Parameters.AddWithValue("@value", newEmployee.Value);
+
+            // Execute the insert and check how many rows were affected
+            int affectedRows = insertCmd.ExecuteNonQuery();
+
+            if (affectedRows > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(500, "Failed to add employee.");
+            }
         }
     }
-}
 
-[HttpPut("{id}")]
-public IActionResult Update(int id, [FromBody] Employee updatedEmployee)
-{
-    using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
+            // Updates the details of an existing employee.
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, [FromBody] Employee updatedEmployee)
     {
-        connection.Open();
-        var updateCmd = connection.CreateCommand();
-        updateCmd.CommandText = "UPDATE Employees SET Name = @name, Value = @value WHERE ID = @id";
-        updateCmd.Parameters.AddWithValue("@id", id);
-        updateCmd.Parameters.AddWithValue("@name", updatedEmployee.Name);
-        updateCmd.Parameters.AddWithValue("@value", updatedEmployee.Value);
+        using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
+        {
+            connection.Open();
+            // Prepare the SQL command to update the employee data
+            var updateCmd = connection.CreateCommand();
+            updateCmd.CommandText = "UPDATE Employees SET Name = @name, Value = @value WHERE ID = @id";
+            updateCmd.Parameters.AddWithValue("@id", id);
+            updateCmd.Parameters.AddWithValue("@name", updatedEmployee.Name);
+            updateCmd.Parameters.AddWithValue("@value", updatedEmployee.Value);
 
-        int affectedRows = updateCmd.ExecuteNonQuery();
-        
-        return affectedRows > 0 ? Ok() : NotFound();
+            // Execute the update and check how many rows were affected
+            int affectedRows = updateCmd.ExecuteNonQuery();
+            
+            return affectedRows > 0 ? Ok() : NotFound();
+        }
     }
-}
-
-}
-}
+}}
