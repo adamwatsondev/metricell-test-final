@@ -20,11 +20,20 @@ interface Employee {
   value: number;
 }
 
+interface GroupedSummedEmployee {
+  key: string;
+  value: number;
+  employees: string[];
+}
+
 function App() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [newEmployee, setNewEmployee] = useState({ name: "", value: 0 });
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [summedEmployees, setSummedEmployees] = useState<Employee[]>([]);
+  const [groupedSummedEmployees, setGroupedSummedEmployees] = useState<
+    GroupedSummedEmployee[]
+  >([]);
 
   useEffect(() => {
     fetchEmployees();
@@ -284,6 +293,22 @@ function App() {
     }
   };
 
+  const fetchGroupedSummedValues = async () => {
+    try {
+      const response = await fetch("/api/list/sum-values-grouped");
+      if (response.ok) {
+        const data = await response.json();
+        setGroupedSummedEmployees(data);
+        toast.success("Grouped Summed Values fetched.");
+      } else {
+        toast.info("No data available for grouped sums.");
+      }
+    } catch (error) {
+      console.error("Error fetching grouped summed values:", error);
+      toast.error("Failed to fetch grouped summed values.");
+    }
+  };
+
   return (
     <>
       <Theme>
@@ -294,7 +319,12 @@ function App() {
           <Tabs.Root defaultValue="account">
             <Tabs.List>
               <Tabs.Trigger value="employees">Employees</Tabs.Trigger>
-              <Tabs.Trigger value="summed">Summed Employees</Tabs.Trigger>
+              <Tabs.Trigger value="summed">
+                Summed Employees - Attempt 1/Wrong
+              </Tabs.Trigger>
+              <Tabs.Trigger value="grouped">
+                Grouped Employees - Attempt 2/Correct
+              </Tabs.Trigger>
             </Tabs.List>
 
             <Box pt="3">
@@ -434,6 +464,43 @@ function App() {
                     </span>
                   </div>
                 )}
+              </Tabs.Content>
+
+              <Tabs.Content value="grouped">
+                <div className="flex justify-center gap-4">
+                  <Button onClick={fetchGroupedSummedValues} color="blue">
+                    {summedEmployees.length > 0
+                      ? "Refetch Grouped Values"
+                      : "Fetch Grouped Values"}
+                  </Button>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {groupedSummedEmployees.map((group) => (
+                    <div key={group.key}>
+                      <span className="text-2xl font-bold">{group.key}</span>
+                      <Table.Root variant="surface">
+                        <Table.Header>
+                          <Table.ColumnHeaderCell>
+                            Employees
+                          </Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell>Sum</Table.ColumnHeaderCell>
+                        </Table.Header>
+                        <Table.Body>
+                          <Table.Row>
+                            <Table.Cell>
+                              <ul>
+                                {group.employees.map((employee, index) => (
+                                  <li key={index}>{employee}</li>
+                                ))}
+                              </ul>
+                            </Table.Cell>
+                            <Table.Cell>{group.value}</Table.Cell>
+                          </Table.Row>
+                        </Table.Body>
+                      </Table.Root>
+                    </div>
+                  ))}
+                </div>
               </Tabs.Content>
             </Box>
           </Tabs.Root>

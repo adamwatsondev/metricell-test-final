@@ -76,5 +76,64 @@ public IActionResult GetSummedEmployees()
     return NoContent();
 }
 
+[HttpGet("sum-values-grouped")]
+public IActionResult GetGroupedSummedEmployees()
+{
+    var groupedResults = new Dictionary<char, (int sum, List<string> employees)>();
+
+    using (var connection = new SqliteConnection("Data Source=./SqliteDB.db"))
+    {
+        connection.Open();
+
+        var queryCmd = connection.CreateCommand();
+        queryCmd.CommandText = @"
+            SELECT Name, Value
+            FROM Employees
+            WHERE Name LIKE 'A%' OR Name LIKE 'B%' OR Name LIKE 'C%';
+        ";
+
+        using (var reader = queryCmd.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                var name = reader.GetString(0);
+                var value = reader.GetInt32(1);
+
+                char firstLetter = name[0];
+                if (groupedResults.ContainsKey(firstLetter))
+                {
+                    groupedResults[firstLetter] = (
+                        groupedResults[firstLetter].sum + value,
+                        groupedResults[firstLetter].employees.Append(name).ToList()
+                    );
+                }
+                else
+                {
+                    groupedResults[firstLetter] = (value, new List<string> { name });
+                }
+            }
+        }
+    }
+
+    var filteredResults = groupedResults
+        .Where(kv => kv.Value.sum >= 11171)
+        .Select(kv => new 
+        {
+            key = kv.Key.ToString(),
+            value = kv.Value.sum,
+            employees = kv.Value.employees
+        })
+        .ToList();
+
+    if (filteredResults.Any())
+    {
+        return Ok(filteredResults);
+    }
+
+    return NoContent();
+}
+
+
+
     }
 }
