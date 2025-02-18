@@ -146,18 +146,20 @@ function App() {
                     if (!open) setEditingEmployee(null);
                   }}
                 >
-                  <Dialog.Trigger>
-                    <Button
-                      color="gray"
-                      onClick={() => setEditingEmployee(employee)}
-                    >
-                      <img
-                        src="/icons/edit.svg"
-                        className="size-6"
-                        alt="edit"
-                      />
-                    </Button>
-                  </Dialog.Trigger>
+                  <Tooltip content="Edit this employee">
+                    <Dialog.Trigger>
+                      <Button
+                        color="gray"
+                        onClick={() => setEditingEmployee(employee)}
+                      >
+                        <img
+                          src="/icons/edit.svg"
+                          className=" size-3 sm:size-6"
+                          alt="edit"
+                        />
+                      </Button>
+                    </Dialog.Trigger>
+                  </Tooltip>
 
                   <Dialog.Content maxWidth="450px">
                     <Dialog.Title>Edit Employee</Dialog.Title>
@@ -223,15 +225,17 @@ function App() {
                 </Dialog.Root>
 
                 <Dialog.Root>
-                  <Dialog.Trigger>
-                    <Button color="red">
-                      <img
-                        src="/icons/delete.svg"
-                        className="text-white size-6"
-                        alt="delete"
-                      />
-                    </Button>
-                  </Dialog.Trigger>
+                  <Tooltip content="Delete this employee">
+                    <Dialog.Trigger>
+                      <Button color="red">
+                        <img
+                          src="/icons/delete.svg"
+                          className=" size-4 sm:size-6"
+                          alt="delete"
+                        />
+                      </Button>
+                    </Dialog.Trigger>
+                  </Tooltip>
 
                   <Dialog.Content maxWidth="450px">
                     <Dialog.Title>Delete Confirmation</Dialog.Title>
@@ -239,7 +243,7 @@ function App() {
                     <Flex direction="column" gap="3">
                       <label>
                         <Text as="div" size="2" mb="1" weight="regular">
-                          Are you sure you want to delete this Employee?
+                          Are you sure you want to delete this employee?
                         </Text>
                       </label>
                     </Flex>
@@ -326,22 +330,18 @@ function App() {
         <div className="fixed top-0 left-0 w-full z-10 bg-white shadow-md h-16">
           <Header />
         </div>
-        <div className="flex pt-40 flex-col px-40 gap-4">
+        <div className="flex pt-32 sm:pt-40 flex-col px-4 sm:px-40 gap-4">
           <Tabs.Root defaultValue="account">
             <Tabs.List>
               <Tabs.Trigger value="employees">Employees</Tabs.Trigger>
-              <Tabs.Trigger value="summed">
-                Summed Employees - Attempt 1/Wrong
-              </Tabs.Trigger>
-              <Tabs.Trigger value="grouped">
-                Grouped Employees - Attempt 2/Correct
-              </Tabs.Trigger>
+              <Tabs.Trigger value="summed">Summed</Tabs.Trigger>
+              <Tabs.Trigger value="grouped">Grouped</Tabs.Trigger>
             </Tabs.List>
 
             <Box pt="3">
               <Tabs.Content className="flex flex-col gap-4" value="employees">
-                <div className="flex justify-between">
-                  <span className="text-2xl font-bold">
+                <div className="flex items-center justify-between">
+                  <span className="sm:text-2xl text-sm font-bold">
                     Employees: {employees.length}
                   </span>
                   <div className="flex gap-2">
@@ -351,19 +351,21 @@ function App() {
                         variant="outline"
                         color="blue"
                       >
-                        Update Employee Values
+                        Update
                       </Button>
                     </Tooltip>
                     <Dialog.Root>
-                      <Dialog.Trigger>
-                        <Button color="green">
-                          <img
-                            src="/icons/plus.svg"
-                            className="text-white size-6"
-                            alt="add"
-                          />
-                        </Button>
-                      </Dialog.Trigger>
+                      <Tooltip content="Add an employee">
+                        <Dialog.Trigger>
+                          <Button color="green">
+                            <img
+                              src="/icons/plus.svg"
+                              className="text-white size-6"
+                              alt="add"
+                            />
+                          </Button>
+                        </Dialog.Trigger>
+                      </Tooltip>
 
                       <Dialog.Content maxWidth="450px">
                         <Dialog.Title>Add Employee</Dialog.Title>
@@ -438,7 +440,7 @@ function App() {
                 </div>
               </Tabs.Content>
 
-              <Tabs.Content value="summed">
+              <Tabs.Content className="flex flex-col gap-4" value="summed">
                 <div className="flex justify-center gap-4">
                   <Button onClick={fetchSummedValues} color="blue">
                     {summedEmployees.length > 0
@@ -448,7 +450,7 @@ function App() {
                 </div>
                 {summedEmployees.length > 0 && (
                   <div className="flex flex-col gap-4">
-                    <span className="text-2xl font-bold">
+                    <span className="sm:text-2xl text-sm font-bold">
                       Summed Employees: {summedEmployees.length}
                     </span>
                     <Table.Root variant="surface">
@@ -478,7 +480,7 @@ function App() {
                 )}
               </Tabs.Content>
 
-              <Tabs.Content value="grouped">
+              <Tabs.Content className="flex flex-col gap-4" value="grouped">
                 <div className="flex justify-center gap-4">
                   <Button onClick={fetchGroupedSummedValues} color="blue">
                     {summedEmployees.length > 0
