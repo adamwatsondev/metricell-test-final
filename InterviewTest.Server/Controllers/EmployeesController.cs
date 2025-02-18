@@ -26,7 +26,7 @@ public class EmployeesController : ControllerBase
                 {
                     employees.Add(new Employee
                     {
-                        ID = reader.GetInt32(0),  // Make sure you get the ID
+                        ID = reader.GetInt32(0),
                         Name = reader.GetString(1),
                         Value = reader.GetInt32(2)
                     });
