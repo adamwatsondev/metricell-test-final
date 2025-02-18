@@ -105,7 +105,7 @@ function App() {
       if (response.ok) {
         toast.success("Employee updated successfully.");
         fetchEmployees();
-        setEditingEmployee(null); // Close the dialog
+        setEditingEmployee(null);
       } else {
         toast.error("Failed to update employee");
       }
@@ -118,9 +118,11 @@ function App() {
   const EmployeeTable = ({
     employees,
     removeEmployee,
+    setEditingEmployee,
   }: {
     employees: Employee[];
     removeEmployee: (id: number) => void;
+    setEditingEmployee: React.Dispatch<React.SetStateAction<Employee | null>>;
   }) => {
     return (
       <Table.Root variant="surface">
@@ -139,8 +141,10 @@ function App() {
               <Table.Cell>{employee.value}</Table.Cell>
               <Table.Cell className="flex justify-end gap-2 items-center">
                 <Dialog.Root
-                  open={!!editingEmployee}
-                  onOpenChange={(open) => !open && setEditingEmployee(null)}
+                  open={editingEmployee !== null}
+                  onOpenChange={(open) => {
+                    if (!open) setEditingEmployee(null);
+                  }}
                 >
                   <Dialog.Trigger>
                     <Button
@@ -150,7 +154,7 @@ function App() {
                       <img
                         src="/icons/edit.svg"
                         className="size-6"
-                        alt="delete"
+                        alt="edit"
                       />
                     </Button>
                   </Dialog.Trigger>
@@ -429,6 +433,7 @@ function App() {
                   <EmployeeTable
                     employees={employees}
                     removeEmployee={removeEmployee}
+                    setEditingEmployee={setEditingEmployee}
                   />
                 </div>
               </Tabs.Content>
