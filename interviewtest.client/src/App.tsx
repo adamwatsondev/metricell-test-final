@@ -29,8 +29,8 @@ interface GroupedSummedEmployee {
 function App() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [newEmployee, setNewEmployee] = useState({ name: "", value: 0 });
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [summedEmployees, setSummedEmployees] = useState<Employee[]>([]);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [groupedSummedEmployees, setGroupedSummedEmployees] = useState<
     GroupedSummedEmployee[]
   >([]);
@@ -92,39 +92,37 @@ function App() {
     }
   };
 
-  const updateEmployee = async () => {
-    if (editingEmployee) {
-      try {
-        const response = await fetch(`api/employees/${editingEmployee.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editingEmployee),
-        });
+  const editEmployee = async (employee: Employee) => {
+    try {
+      const response = await fetch(`/api/employees/${employee.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(employee),
+      });
 
-        if (response.ok) {
-          fetchEmployees();
-          toast.success("Employee updated successfully.");
-          setEditingEmployee(null);
-        } else {
-          const errorMessage = await response.text();
-          console.error("Failed to update employee:", errorMessage);
-          toast.error("Failed to update employee");
-        }
-      } catch (error) {
-        console.error("Error updating employee:", error);
+      if (response.ok) {
+        toast.success("Employee updated successfully.");
+        fetchEmployees();
+        setEditingEmployee(null);
+      } else {
         toast.error("Failed to update employee");
       }
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      toast.error("Failed to update employee");
     }
   };
 
   const EmployeeTable = ({
     employees,
     removeEmployee,
+    setEditingEmployee,
   }: {
     employees: Employee[];
     removeEmployee: (id: number) => void;
+    setEditingEmployee: React.Dispatch<React.SetStateAction<Employee | null>>;
   }) => {
     return (
       <Table.Root variant="surface">
@@ -143,13 +141,19 @@ function App() {
               <Table.Cell>{employee.value}</Table.Cell>
               <Table.Cell className="flex justify-end gap-2 items-center">
                 <Dialog.Root
-                  onOpenChange={(open) => open || setEditingEmployee(null)}
+                  open={editingEmployee !== null}
+                  onOpenChange={(open) => {
+                    if (!open) setEditingEmployee(null);
+                  }}
                 >
                   <Dialog.Trigger>
-                    <Button color="gray">
+                    <Button
+                      color="gray"
+                      onClick={() => setEditingEmployee(employee)}
+                    >
                       <img
                         src="/icons/edit.svg"
-                        className="text-white size-6"
+                        className="size-6"
                         alt="edit"
                       />
                     </Button>
@@ -157,6 +161,9 @@ function App() {
 
                   <Dialog.Content maxWidth="450px">
                     <Dialog.Title>Edit Employee</Dialog.Title>
+                    <Dialog.Description size="2" mb="4">
+                      Edit the details of the employee.
+                    </Dialog.Description>
 
                     <Flex direction="column" gap="3">
                       <label>
@@ -164,6 +171,7 @@ function App() {
                           Name
                         </Text>
                         <TextField.Root
+                          placeholder="Enter a name"
                           value={editingEmployee?.name || ""}
                           onChange={(e) =>
                             setEditingEmployee({
@@ -178,14 +186,13 @@ function App() {
                           Value
                         </Text>
                         <TextField.Root
-                          value={editingEmployee?.value || ""}
+                          placeholder="Enter a value"
                           type="number"
+                          value={editingEmployee?.value || ""}
                           onChange={(e) =>
                             setEditingEmployee({
                               ...editingEmployee!,
-                              value: e.target.value
-                                ? parseInt(e.target.value)
-                                : 0,
+                              value: parseInt(e.target.value) || 0,
                             })
                           }
                         />
@@ -200,11 +207,15 @@ function App() {
                       </Dialog.Close>
                       <Dialog.Close>
                         <Button
-                          onClick={updateEmployee}
+                          onClick={() => {
+                            if (editingEmployee) {
+                              editEmployee(editingEmployee);
+                            }
+                          }}
                           variant="solid"
                           color="green"
                         >
-                          Update
+                          Save
                         </Button>
                       </Dialog.Close>
                     </Flex>
@@ -422,6 +433,7 @@ function App() {
                   <EmployeeTable
                     employees={employees}
                     removeEmployee={removeEmployee}
+                    setEditingEmployee={setEditingEmployee}
                   />
                 </div>
               </Tabs.Content>
